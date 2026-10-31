@@ -1,0 +1,4 @@
+Evaluation Stage,Model Architecture,Decision Threshold,Recall (Sensitivity),Precision,F1-Score,F2-Score,Accuracy,ROC-AUC,Brier Score,Missed Admissions (FN),Clinical Loss
+Week 5 Baseline,Dummy / Unweighted Baseline,0.5,0.0,0.0,0.0,0.0,0.8828,0.5,0.1035,146,730.0
+Week 6 Candidate,Random Forest (Default),0.5,0.0137,0.1429,0.025,0.0167,0.8752,0.4877,0.1743,144,732.0
+Week 7 Refined,Balanced Random Forest + Isotonic Calibration,0.38,0.8836,0.1162,0.2054,0.3808,0.2016,0.5,0.1038,17,1066.0

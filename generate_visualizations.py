@@ -908,7 +908,7 @@ def render_standalone_dashboard(master_df: pd.DataFrame, wh_df: pd.DataFrame, b6
 </html>
 """
 
-    with open("reports/dashboard.html", "w", encoding="utf-8") as f:
+    with open("reports/swiftlog_dashboard.html", "w", encoding="utf-8") as f:
         f.write(html)
 
 

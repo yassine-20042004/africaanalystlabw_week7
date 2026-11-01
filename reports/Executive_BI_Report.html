@@ -12,7 +12,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       line-height: 1.6;
       color: #1e293b;
-      max-width: 980px;
+      max-width: 1020px;
       margin: 0 auto;
       padding: 40px 24px;
       background: #f8fafc;
@@ -23,14 +23,16 @@
       margin-bottom: 30px;
     }
     h1 { font-size: 26px; color: #0f172a; margin-bottom: 6px; }
-    .meta { font-size: 13px; color: #64748b; }
+    .meta { font-size: 13px; color: #64748b; line-height: 1.5; }
     .kpi-row {
       display: flex;
       gap: 15px;
       margin: 25px 0;
+      flex-wrap: wrap;
     }
     .kpi-card {
       flex: 1;
+      min-width: 180px;
       background: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 8px;
@@ -41,6 +43,7 @@
     .kpi-card.danger { border-top-color: #ef4444; }
     .kpi-card.warning { border-top-color: #f59e0b; }
     .kpi-card.success { border-top-color: #10b981; }
+    .kpi-card.purple { border-top-color: #8b5cf6; }
     .kpi-title { font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; }
     .kpi-val { font-size: 24px; font-weight: 800; color: #0f172a; margin: 4px 0; }
     .kpi-sub { font-size: 11px; color: #94a3b8; }
@@ -67,6 +70,27 @@
     }
     .badge-pass { background: #dcfce7; color: #166534; }
     .badge-warn { background: #fef3c7; color: #92400e; }
+    .badge-fail { background: #fee2e2; color: #991b1b; }
+    .badge-info { background: #e0f2fe; color: #0369a1; }
+    .figure-block {
+      margin: 24px 0;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+    }
+    .figure-block img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+    .figure-caption {
+      margin-top: 10px;
+      font-size: 12.5px;
+      color: #64748b;
+      text-align: justify;
+    }
   </style>
 </head>
 <body>
@@ -74,7 +98,8 @@
   <div class="header-box">
     <h1>HealthConnect Rwanda — Executive Business Intelligence Report</h1>
     <div class="meta">
-      <strong>AnalystLab Africa Experience Lab</strong> | Track 2: Healthcare Predictive Analytics & Population Health Intelligence<br>
+      <strong>AnalystLab Africa Experience Lab Internship Programme</strong> | Official Capstone Deliverable<br>
+      <strong>Lead Healthcare Data Scientist:</strong> Saad Janane (Track 2) | <strong>Lead Machine Learning Engineer:</strong> Zaid Harboul (Track 4 / HC-POD)<br>
       Evaluation Period: 2026 Baseline & 2027 Projections | Scope: 20 Facilities, 27 Relational Datasets, 250,000+ Records
     </div>
   </div>
@@ -100,12 +125,17 @@
       <div class="kpi-val">11.72%</div>
       <div class="kpi-sub">Mean Stay: 5.49 Days</div>
     </div>
+    <div class="kpi-card purple">
+      <div class="kpi-title">AI Admission Recall</div>
+      <div class="kpi-val" style="color:#7c3aed;">88.36%</div>
+      <div class="kpi-sub">FN Missed: 17 (vs 144 Week 6)</div>
+    </div>
   </div>
 
   <h2>1. Executive Summary & Context</h2>
   <p>
     Operating 20 healthcare centers and regional referral hospitals across all 5 provinces of Rwanda, HealthConnect Rwanda coordinates nationwide healthcare delivery, patient consultations, diagnostic testing, inpatient admissions, and claims processing.
-    In 2026, the health system managed 60,809 clinical encounters and generated 1.132 Billion RWF in gross invoicing. This report synthesizes key findings from our comprehensive data science and predictive analytics transformation study.
+    In 2026, the health system managed 60,809 clinical encounters and generated 1.132 Billion RWF in gross invoicing. This report synthesizes key findings from our comprehensive data science and predictive analytics transformation study, including our collaborative Week 7 Model Testing, Refinement & MLOps deployment validation with Lead ML Engineer Zaid Harboul.
   </p>
 
   <h2>2. Inferential Hypothesis Testing Results (Alpha = 0.05)</h2>
@@ -266,7 +296,96 @@
     </tbody>
   </table>
 
-  <h2>4. C-Suite Strategic Transformation Recommendations</h2>
+  <h2>4. Week 7 Clinical AI Model Refinement & Cross-Track Validation (Saad Janane & Zaid Harboul)</h2>
+  <p>
+    During rigorous Week 7 model validation, error decomposition revealed that the Week 6 candidate model exhibited a dangerous failure mode: while nominal accuracy was 87.52%, the model's default decision threshold (&tau; = 0.50) suffered a near-zero Recall of 1.37%, missing 144 out of 146 true inpatient admissions (98.6% miss rate).
+    Furthermore, slice testing demonstrated 0.0% recall across Pediatric, Young Adult, and Middle-Aged cohorts.
+  </p>
+  <p>
+    To resolve this clinical defect, Track 2 (Saad Janane) engineered a multi-variable Clinical Acuity Score, applied cost-sensitive class weights (1:7.5), performed 3-fold cross-validated Isotonic Probability Calibration, and swept decision thresholds under asymmetric clinical loss (5&times;FN + 1&times;FP).
+    Collaborating with Track 4 (Zaid Harboul), we co-developed vectorized batch inference meeting the strict &lt; 5.0 ms production SLO.
+  </p>
+
+  <table class="table-custom">
+    <thead>
+      <tr>
+        <th>Evaluation Dimension</th>
+        <th>Week 6 Candidate Model</th>
+        <th>Week 7 Refined Model</th>
+        <th>Clinical & Operational Impact</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Model Architecture</strong></td>
+        <td>Balanced Random Forest (Default &tau;=0.50)</td>
+        <td>Balanced RF + Acuity Score (&tau;=0.38)</td>
+        <td>Clinical Acuity Feature Engineering</td>
+      </tr>
+      <tr>
+        <td><strong>Admission Recall</strong></td>
+        <td><span class="badge badge-fail">1.37% (2 / 146)</span></td>
+        <td><span class="badge badge-pass">88.36% (129 / 146)</span></td>
+        <td><strong>+86.99% Gain</strong> in catching critically ill patients</td>
+      </tr>
+      <tr>
+        <td><strong>Missed Admissions (FN)</strong></td>
+        <td><span class="badge badge-fail">144 Missed Admissions</span></td>
+        <td><span class="badge badge-pass">17 Missed Admissions</span></td>
+        <td><strong>88.2% Reduction</strong> in life-threatening false negatives</td>
+      </tr>
+      <tr>
+        <td><strong>Brier Score (Reliability)</strong></td>
+        <td>0.1743 (Uncalibrated)</td>
+        <td>0.1038 (Isotonic Calibrated)</td>
+        <td><strong>40.4% Improvement</strong> in risk probability reliability</td>
+      </tr>
+      <tr>
+        <td><strong>Subgroup Disparity</strong></td>
+        <td><span class="badge badge-fail">0.0% Recall (Pediatric/Adults)</span></td>
+        <td><span class="badge badge-pass">&ge; 85.2% Recall Across All</span></td>
+        <td>Zero demographic disparity across all age cohorts</td>
+      </tr>
+      <tr>
+        <td><strong>Batch Latency / Throughput</strong></td>
+        <td>164.1 ms / 6.1 req/s</td>
+        <td><span class="badge badge-pass">0.11 ms / 9,495.9 req/s</span></td>
+        <td><strong>1,558x Speedup</strong> co-developed with Zaid Harboul</td>
+      </tr>
+      <tr>
+        <td><strong>Edge Case Resilience</strong></td>
+        <td>Untested</td>
+        <td><span class="badge badge-pass">10 / 10 Passed (100%)</span></td>
+        <td>Resilient to missing vitals, unseen strings, extreme values</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="figure-block">
+    <img src="figures/fig16_confusion_matrix_before_after.png" alt="Figure 16">
+    <div class="figure-caption">
+      <strong>Figure 16: Confusion Matrix Evolution (Week 6 Defect vs Week 7 Refined).</strong>
+      Illustrates the decisive elimination of 127 false negatives (missed hospital admissions), dropping missed admissions from 144 down to 17.
+    </div>
+  </div>
+
+  <div class="figure-block">
+    <img src="figures/fig17_threshold_optimization_curve.png" alt="Figure 17">
+    <div class="figure-caption">
+      <strong>Figure 17: Clinical Decision Threshold Sensitivity Optimization Curve.</strong>
+      Demonstrates the threshold trade-off trajectory sweeping &tau; from 0.05 to 0.95. Selected threshold at &tau; = 0.38 optimizes the asymmetric clinical loss and maximizes F2-Score at 0.381.
+    </div>
+  </div>
+
+  <div class="figure-block">
+    <img src="figures/fig21_cross_track_mle_integration_telemetry.png" alt="Figure 21">
+    <div class="figure-caption">
+      <strong>Figure 21: Cross-Track MLE Integration Telemetry co-developed with Zaid Harboul.</strong>
+      Compares row-by-row vs vectorized inference performance, demonstrating 9,495.9 requests/second throughput and 0.11 ms latency (1,558x speedup) comfortably within production SLO limits.
+    </div>
+  </div>
+
+  <h2>5. C-Suite Strategic Transformation Recommendations</h2>
   <ol style="font-size: 13.5px; color: #334155; padding-left: 20px; line-height: 1.8;">
     <li><strong>Dedicated Outpatient NCD Clinics</strong>: Screen and treat the 74.65% chronic disease population early, reducing emergency admissions by 25% and saving 85M RWF annually.</li>
     <li><strong>Automated Claims Pre-Scrubber</strong>: Address the 50% claims delay bottleneck, accelerating approvals to >85% and unlocking 1.8 Billion RWF in liquidity.</li>
@@ -276,7 +395,8 @@
   </ol>
 
   <div style="margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 15px; font-size: 11px; color: #94a3b8; text-align: center;">
-    Certified by HealthConnect Rwanda Analytics & AI Transformation Team — AnalystLab Africa Experience Lab Version 1.0 Release.
+    Certified by HealthConnect Rwanda Analytics & AI Transformation Team — Lead Data Scientist: Saad Janane (Track 2) | Lead ML Engineer: Zaid Harboul (Track 4 / HC-POD).<br>
+    AnalystLab Africa Experience Lab Internship Programme — Week 7 Capstone Release.
   </div>
 
 </body>
